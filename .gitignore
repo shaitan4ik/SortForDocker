@@ -1,6 +1,6 @@
 #VScode setting's folder 
 /.VScode
-
+.VScode/
 # Prerequisites
 *.d
 
