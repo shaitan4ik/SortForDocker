@@ -1,6 +1,6 @@
 #VScode setting's folder 
-/.VScode
 .VScode/
+
 # Prerequisites
 *.d
 
@@ -30,6 +30,8 @@
 *.lib
 
 # Executables
+
+main
 *.exe
 *.out
 *.app
