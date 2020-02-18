@@ -44,33 +44,42 @@ void selectionSort(vecInt &input) {
   for (int i = 0; i < input.size(); i++) {
     minElementIndex = i;
     for (int j = i; j < input.size(); j++) {
+      if (input[minElementIndex] > input[j]) {
+        minElementIndex = j;
+      }
     }
+    if (minElementIndex != i)
+      std::swap(input[i], input[minElementIndex]);
   }
 }
 
 int main(int argc, char *argv[]) {
-  // Start timeCounter
-  time_point<high_resolution_clock> star, end;
+
+ 
+  time_point<high_resolution_clock> star, end, star2, end2;
+ 
   star = high_resolution_clock::now();
-  //---------------------
-  // Main block
-  vecInt rArray = creatRandomArray(1000);
-  for (auto m : rArray) {
-    cout << m << endl;
-  }
-  insertSort(rArray);
-  for (auto m : rArray) {
-    cout << m << endl;
-  }
-  // End block
-  // End timeCounter
+  vecInt rArray = creatRandomArray(80000);
+  selectionSort(rArray);
   end = high_resolution_clock::now();
 
-  int elapsedTime = duration_cast<milliseconds>(end - star).count();
-  std::time_t endTime = high_resolution_clock::to_time_t(end);
+  star2 = high_resolution_clock::now();
+  vecInt rArray2 = creatRandomArray(100000);
+  insertSort(rArray2);
+  end2 = high_resolution_clock::now();
 
-  cout << "Время завершения выполнения: " << ctime(&endTime)
-       << "Время выполнения: " << elapsedTime << " milliseconds" << endl;
+  int elapsedTime = duration_cast<milliseconds>(end - star).count();
+  int elapsedTime2 = duration_cast<milliseconds>(end2 - star2).count();
+
+  std::time_t endTime1 = high_resolution_clock::to_time_t(end);
+  std::time_t endTime2 = high_resolution_clock::to_time_t(end2);
+
+  cout << "Время завершения выполнения selectionSort: " << ctime(&endTime1)
+       << "Время выполнения selectiomSort: " << elapsedTime << " milliseconds"
+       << endl
+       << "Время завершения выполнения insertSort: " << ctime(&endTime2)
+       << "Время выполнения insertSort: " << elapsedTime2 << " milliseconds"
+       << endl;
   //----------------------
   return 0;
 }
