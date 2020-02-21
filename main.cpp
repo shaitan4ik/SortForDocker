@@ -4,7 +4,7 @@
 #include <random>
 #include <string>
 #include <vector>
-
+#define ELEMENT_COUNT 10
 using vecInt = std::vector<int>;
 using std::cout;
 using namespace std::chrono;
@@ -16,7 +16,7 @@ vecInt creatRandomArray(int coutnOfNumber) {
   std::mt19937 gen(std::time(0));
   // Creat init sequence
   vecInt::iterator it = resultSequence.begin();
-  for (int i; i < coutnOfNumber; i++) {
+  for (int i = 0; i < coutnOfNumber; i++) {
     *it = i;
     it++;
   }
@@ -28,6 +28,41 @@ vecInt creatRandomArray(int coutnOfNumber) {
   }
 
   return resultSequence;
+}
+
+void mergeSort(vecInt &input, vecInt &scratch, int start, int end) {
+
+  if (start == end)
+    return;
+
+  int midpoint = (start + end) / 2;
+  mergeSort(input, scratch, start, midpoint);
+  mergeSort(input, scratch, midpoint + 1, end);
+
+  int left_index = start;
+  int right_index = midpoint + 1;
+  int scratch_index = left_index;
+  while (left_index <= midpoint and right_index <= end) {
+    if (input[left_index] < input[right_index]) {
+      scratch[scratch_index] = input[left_index];
+      ++left_index;
+    } else {
+      scratch[scratch_index] = input[right_index];
+      ++right_index;
+    }
+    scratch_index++;
+  }
+  for (int i = left_index; i <= midpoint; i++) {
+    scratch[scratch_index] = input[i];
+    scratch_index++;
+  }
+  for (int i = right_index; i <= end; i++) {
+    scratch[scratch_index] = input[i];
+    scratch_index++;
+  }
+  for (int i = start; i <= end; i++) {
+    input[i] = scratch[i];
+  }
 }
 
 void insertSort(vecInt &input) {
@@ -55,21 +90,27 @@ void selectionSort(vecInt &input) {
 
 int main(int argc, char *argv[]) {
 
- 
   time_point<high_resolution_clock> star, end, star2, end2;
- 
+  vecInt rArray = creatRandomArray(10);
+
   star = high_resolution_clock::now();
-  vecInt rArray = creatRandomArray(80000);
   selectionSort(rArray);
   end = high_resolution_clock::now();
-
+  vecInt rArray2 = creatRandomArray(ELEMENT_COUNT);
   star2 = high_resolution_clock::now();
-  vecInt rArray2 = creatRandomArray(100000);
-  insertSort(rArray2);
+
+  vecInt temp_array(ELEMENT_COUNT);
+
+  mergeSort(rArray2, temp_array, 0, ELEMENT_COUNT - 1);
+  // selectionSort(rArray2);
+  /* for (auto m : rArray2) {
+     cout << m << endl;
+   }*/
+
   end2 = high_resolution_clock::now();
 
-  int elapsedTime = duration_cast<milliseconds>(end - star).count();
-  int elapsedTime2 = duration_cast<milliseconds>(end2 - star2).count();
+  int elapsedTime = duration_cast<nanoseconds>(end - star).count();
+  int elapsedTime2 = duration_cast<nanoseconds>(end2 - star2).count();
 
   std::time_t endTime1 = high_resolution_clock::to_time_t(end);
   std::time_t endTime2 = high_resolution_clock::to_time_t(end2);
@@ -80,6 +121,7 @@ int main(int argc, char *argv[]) {
        << "Время завершения выполнения insertSort: " << ctime(&endTime2)
        << "Время выполнения insertSort: " << elapsedTime2 << " milliseconds"
        << endl;
-  //----------------------
+  //----------------------*/
+
   return 0;
 }
