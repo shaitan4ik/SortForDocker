@@ -1,10 +1,12 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
+#include <omp.h>
 #include <random>
 #include <string>
 #include <vector>
-#define ELEMENT_COUNT 10
+#define ELEMENT_COUNT 1000000
+
 using vecInt = std::vector<int>;
 using std::cout;
 using namespace std::chrono;
@@ -65,6 +67,59 @@ void mergeSort(vecInt &input, vecInt &scratch, int start, int end) {
   }
 }
 
+vecInt mergeVecInt(const vecInt &left, const vecInt &right) {
+
+  vecInt result;
+  int left_it, right_it = 0;
+
+  while (left_it < left.size() && right_it < right.size()) {
+    if (left[left_it] < right[right_it]) {
+      result.push_back(left[left_it]);
+      left_it++;
+    } else {
+      result.push_back(right[right_it]);
+      right_it++;
+    }
+  }
+  while (left_it < left.size()) {
+    result.push_back(left[left_it]);
+    left_it++;
+  }
+  while (right_it < right.size()) {
+    result.push_back(right[right_it]);
+    right_it++;
+  }
+  return result;
+}
+
+vecInt parallelMergeSort(vecInt &input, int numThreads) {
+  // Condition of end recursive call
+  if (input.size() == 1) {
+    return input;
+  }
+  // Find the middle vector
+
+  vecInt::iterator middle = input.begin() + input.size() / 2;
+
+  // Creat two left and right part vector
+
+  vecInt left(input.begin(), middle);
+  vecInt right(middle, input.end());
+  if (numThreads > 1) {
+#pragma omp parallel sections
+    {
+#pragma omp section
+      { left = parallelMergeSort(left, numThreads / 2); }
+#pragma omp section
+      { right = parallelMergeSort(right, numThreads - numThreads / 2); }
+    }
+  } else {
+    parallelMergeSort(left, numThreads);
+    parallelMergeSort(right, numThreads);
+  }
+  return mergeVecInt(left, right);
+}
+
 void insertSort(vecInt &input) {
 
   for (int i = 1; i < input.size(); i++) {
@@ -90,8 +145,8 @@ void selectionSort(vecInt &input) {
 
 int main(int argc, char *argv[]) {
 
-  time_point<high_resolution_clock> star, end, star2, end2;
-  vecInt rArray = creatRandomArray(10);
+  time_point<high_resolution_clock> star, end, star2, end2, start3, end3;
+  vecInt rArray = creatRandomArray(ELEMENT_COUNT);
 
   star = high_resolution_clock::now();
   selectionSort(rArray);
@@ -102,26 +157,34 @@ int main(int argc, char *argv[]) {
   vecInt temp_array(ELEMENT_COUNT);
 
   mergeSort(rArray2, temp_array, 0, ELEMENT_COUNT - 1);
-  // selectionSort(rArray2);
-  /* for (auto m : rArray2) {
-     cout << m << endl;
-   }*/
 
   end2 = high_resolution_clock::now();
 
-  int elapsedTime = duration_cast<nanoseconds>(end - star).count();
-  int elapsedTime2 = duration_cast<nanoseconds>(end2 - star2).count();
+  vecInt rArray3(creatRandomArray(ELEMENT_COUNT));
+
+  start3 = high_resolution_clock::now();
+
+  parallelMergeSort(rArray3, omp_get_max_threads());
+
+  end3 = high_resolution_clock::now();
+
+  long long elapsedTime = duration_cast<nanoseconds>(end - star).count();
+  long long elapsedTime2 = duration_cast<nanoseconds>(end2 - star2).count();
+  long long elapsedTime3 = duration_cast<nanoseconds>(end3 - start3).count();
 
   std::time_t endTime1 = high_resolution_clock::to_time_t(end);
   std::time_t endTime2 = high_resolution_clock::to_time_t(end2);
+  std::time_t endTime3 = high_resolution_clock::to_time_t(end3);
 
   cout << "Время завершения выполнения selectionSort: " << ctime(&endTime1)
-       << "Время выполнения selectiomSort: " << elapsedTime << " milliseconds"
+       << "Время выполнения selectiomSort: " << elapsedTime << " nanoseconds"
        << endl
        << "Время завершения выполнения insertSort: " << ctime(&endTime2)
-       << "Время выполнения insertSort: " << elapsedTime2 << " milliseconds"
+       << "Время выполнения insertSort: " << elapsedTime2 << " nanoseconds"
        << endl;
   //----------------------*/
-
+  cout << "Время завершения parallelMergeSort: " << ctime(&endTime3)
+       << "Время выполнения parallelMergeSort: " << elapsedTime3
+       << "  nanoseconds" << std::endl;
   return 0;
 }
