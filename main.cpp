@@ -1,16 +1,21 @@
 #include <chrono>
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <omp.h>
 #include <random>
 #include <string>
 #include <vector>
-#define ELEMENT_COUNT 1000000
+#define ELEMENT_COUNT 1000
 
-using vecInt = std::vector<int>;
+using timerType = long long int;
+using vecIntType = long long int;
+using vecInt = std::vector<vecIntType>;
 using std::cout;
 using namespace std::chrono;
 using std::endl;
+
+std::ofstream logFile("log.log", std::ios::app);
 
 vecInt creatRandomArray(int coutnOfNumber) {
 
@@ -168,9 +173,9 @@ int main(int argc, char *argv[]) {
 
   end3 = high_resolution_clock::now();
 
-  long long elapsedTime = duration_cast<nanoseconds>(end - star).count();
-  long long elapsedTime2 = duration_cast<nanoseconds>(end2 - star2).count();
-  long long elapsedTime3 = duration_cast<nanoseconds>(end3 - start3).count();
+  timerType elapsedTime = duration_cast<nanoseconds>(end - star).count();
+  timerType elapsedTime2 = duration_cast<nanoseconds>(end2 - star2).count();
+  timerType elapsedTime3 = duration_cast<nanoseconds>(end3 - start3).count();
 
   std::time_t endTime1 = high_resolution_clock::to_time_t(end);
   std::time_t endTime2 = high_resolution_clock::to_time_t(end2);
@@ -186,5 +191,17 @@ int main(int argc, char *argv[]) {
   cout << "Время завершения parallelMergeSort: " << ctime(&endTime3)
        << "Время выполнения parallelMergeSort: " << elapsedTime3
        << "  nanoseconds" << std::endl;
+  if (logFile.is_open()) {
+    logFile << "Время завершения выполнения selectionSort: " << ctime(&endTime1)
+            << "Время выполнения selectiomSort: " << elapsedTime
+            << " nanoseconds" << endl
+            << "Время завершения выполнения insertSort: " << ctime(&endTime2)
+            << "Время выполнения insertSort: " << elapsedTime2 << " nanoseconds"
+            << endl
+            << "Время завершения parallelMergeSort: " << ctime(&endTime3)
+            << "Время выполнения parallelMergeSort: " << elapsedTime3
+            << "  nanoseconds" << std::endl;
+  }
+
   return 0;
 }
