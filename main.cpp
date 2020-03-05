@@ -186,9 +186,8 @@ int main(int argc, char *argv[]) {
        << endl
        << "Время завершения выполнения insertSort: " << ctime(&endTime2)
        << "Время выполнения insertSort: " << elapsedTime2 << " nanoseconds"
-       << endl;
-  //----------------------*/
-  cout << "Время завершения parallelMergeSort: " << ctime(&endTime3)
+       << endl
+       << "Время завершения parallelMergeSort: " << ctime(&endTime3)
        << "Время выполнения parallelMergeSort: " << elapsedTime3
        << "  nanoseconds" << std::endl;
   if (logFile.is_open()) {
