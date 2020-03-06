@@ -1,6 +1,10 @@
 #VScode setting's folder 
 .vscode
 
+#Log files
+
+*.log
+
 # Prerequisites
 *.d
 
